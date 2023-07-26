@@ -1,0 +1,102 @@
+*** BTRFS
+cfdisk /dev/nvme0n1 && mkfs.vfat -F 32 /dev/nvme0n1p1 && cryptsetup -c aes-xts-plain64 -s 512 -y luksFormat /dev/nvme0n1p2 && cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mkfs.btrfs /dev/mapper/cryptroot && mount /dev/mapper/cryptroot /mnt/arch && btrfs su cr /mnt/arch/@  && btrfs su cr /mnt/arch/@home && btrfs su cr /mnt/arch/@opt && btrfs su cr /mnt/arch/@tmp && btrfs su cr /mnt/arch/@var && btrfs su cr /mnt/arch/@log &&  btrfs su cr /mnt/arch/@audit  && btrfs su cr /mnt/arch/@snapshots && umount /mnt/arch && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt/arch && mkdir /mnt/arch/home && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/arch/home && mkdir /mnt/arch/opt && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@opt /dev/mapper/cryptroot /mnt/arch/opt  && mkdir /mnt/arch/tmp && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@tmp /dev/mapper/cryptroot /mnt/arch/tmp && mkdir /mnt/arch/var && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/arch/var && mkdir /mnt/arch/var/log && mount -o nmoatime,compress=zstd,space_cache=v2,discard=async,subvol=@log /dev/mapper/cryptroot /mnt/arch/var/log && mkdir /mnt/arch/var/log/audit && mount -o nmoatime,compress=zstd,space_cache=v2,discard=async,subvol=@audit /dev/mapper/cryptroot /mnt/arch/var/log/audit && mkdir /mnt/arch/.snapshots && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/cryptroot /mnt/arch/.snapshots 
+
+pacstrap /mnt/arch linux-zen linux-zen-headers base base-devel git neovim linux-firmware intel-ucode arch-install-scripts mkinitcpio reflector
+
+arch-chroot /mnt/arch
+
+mount /dev/nvme0n1p1 /boot
+genfstab -U / >> /etc/fstab
+
+reflector --verbose --country 'CA,US' -l 25 --sort rate --save /etc/pacman.d/mirrorlist
+
+pacman -S unzip zip unrar btrfs-progs dosfstools wget curl neofetch upower zathura zathura-pdf-poppler python-pynvim neovim ripgrep fd zsh zsh-completions zoxide fzf fuse flatpak lazygit xdg-user-dirs xdg-user-dirs-gtk xdg-utils gvfs rofi dunst flameshot xsel xclip xorg-xsetroot xorg-server nvidia-dkms nvidia-utils nvidia-settings mesa rng-tools haveged lynis firejail audit sysstat apparmor grub mlocate imv tmux tldr linux-zen linux-zen-headers lxqt-session lxqt-sudo lxqt-powermanagement lxqt-policykit lxqt-config ark alacritty gwenview dolphin 
+
+passwd && useradd -m -G users,wheel,audio,video -s /bin/bash ahsan && passwd ahsan && EDITOR=nvim visudo
+
+grub-install --target=x86_64-efi --efi-directory=/boot && grub-install --target=x86_64-efi --efi-directory=/boot --removable && grub-mkconfig -o /boot/grub/grub.cfg
+
+nvim /etc/default/grub
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=0562681b-e32b-43f0-845e-10101245eab7:cryptroot root=/dev/mapper/cryptroot lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
+
+*** systemd
+ln -sf ../usr/share/zoneinfo/canada/mountain /etc/localtime && nano /etc/locale.gen && locale-gen && eselect locale list && eselect locale set 4 && env-update && source /etc/profile && export ps1="(chroot) ${ps1}"
+
+systemd-firstboot --prompt --setup-machine-id && systemctl enable NetworkManager fstrim.timer acpid systemd-timesyncd sysstat apparmor auditd 
+
+power-profiles-daemon nvidia-hibernate.service nvidia-suspend.service nvidia-resume.service nix-daemon
+
+nvim /etc/modprobe.d/nvidia.conf
+options nvidia-drm modeset=1 
+options nvidia NVreg_UsePageAttributeTable=1
+
+
+nvim /etc/modprobe.d/nvidia-power-management.conf
+options nvidia NVreg_PreserveVideoMemoryAllocations=1 NVreg_TemporaryFilePath=/tmp
+
+
+** Snapper setup
+
+sudo umount /.snapshots && sudo rm -r /.snapshots && sudo snapper -c root create-config / && sudo btrfs subvolume delete /.snapshots && sudo mkdir /.snapshots && sudo mount -a && sudo chmod 750 /.snapshots && sudo snapper -c root create-config / && sudo nvim /etc/snapper/configs/root && sudo chmod a+rx /.snapshots/ && sudo systemclt enable snapper-timeline.timer snapper-cleanup.timer grub-btrfs.path 
+
+ -- WARNING -- This system is for the use of authorized users only. Individuals 
+ using this computer system without authority or in excess of their authority 
+ are subject to having all their activities on this system monitored and 
+ recorded by system personnel. Anyone using this system expressly consents to 
+ such monitoring and is advised that if such monitoring reveals possible 
+ evidence of criminal activity system personal may provide the evidence of such 
+ monitoring to law enforcement officials.
+
+#scaling apps
+--force-device-scale-factor=1.75 %U
+
+#setup snapper
+sudo umount /.snapshots/ && sudo rm -r /.snapshots/ && sudo snapper -c root create-config / && sudo btrfs subvolume delete /.snapshots && sudo mkdir /.snapshots && sudo mount -a && sudo chmod 750 /.snapshots && sudo lvim /etc/snapper/configs/root && sudo systemctl enable --now snapper-timeline.timer && sudo systemctl enable --now snapper-cleanup.timer && yay -S snap-pac-grub snapper-gui
+
+
+sudo lvim /usr/share/gvfs/mounts/network.mount
+AutoMount=false
+
+nvim /etc/sysctl.d/harden.conf
+kernel.core_pattern=|/bin/false
+fs.suid_dumpable=0 
+dev.tty.ldisc_autoload=0
+fs.protected_fifos=2
+fs.protected_regular=2
+kernel.kptr_restrict=2
+kernel.perf_event_paranoid=3
+kernel.sysrq=0
+kernel.unprivileged_bpf_disabled=1
+kernel.unprivileged_userns_clone=0
+net.core.bpf_jit_harden=2
+net.ipv4.conf.all.accept_redirects=0
+net.ipv4.conf.all.log_martians=1
+net.ipv4.conf.all.rp_filter=1
+net.ipv4.conf.all.send_redirects=0
+net.ipv4.conf.default.accept_redirects=0
+net.ipv4.conf.default.log_martians=1
+net.ipv6.conf.all.accept_redirects=0
+net.ipv6.conf.default.accept_redirects=0
+
+
+# Sample Systemd Service
+[Unit]
+Description=
+
+[Service]
+ExecStart=
+
+[Install]
+WantedBy=multi-user.target    
+
+
+ 
+emaint sync -r gentoo
+
+# Post-install chroot
+cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt/gentoo && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/gentoo/home  && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@opt /dev/mapper/cryptroot /mnt/gentoo/opt && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@tmp /dev/mapper/cryptroot /mnt/gentoo/tmp && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/gentoo/var && mount -o nmoatime,compress=zstd,space_cache=v2,discard=async,subvol=@log /dev/mapper/cryptroot /mnt/gentoo/var/log && mount -o nmoatime,compress=zstd,space_cache=v2,discard=async,subvol=@audit /dev/mapper/cryptroot /mnt/gentoo/var/log/audit && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/cryptroot /mnt/gentoo/.snapshots && cd /mnt/gentoo && mkdir --parents /mnt/gentoo/etc/portage/repos.conf && cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf && cp --dereference /etc/resolv.conf /mnt/gentoo/etc/ && mount --types proc /proc /mnt/gentoo/proc && mount --rbind /sys /mnt/gentoo/sys && mount --make-rslave /mnt/gentoo/sys && mount --rbind /dev /mnt/gentoo/dev && mount --make-rslave /mnt/gentoo/dev && mount --bind /run /mnt/gentoo/run && mount --make-slave /mnt/gentoo/run && test -L /dev/shm && rm /dev/shm && mkdir /dev/shm && mount -t tmpfs -o nosuid,nodev,noexec shm /dev/shm && chmod 1777 /dev/shm
+
+chroot /mnt/gentoo /bin/bash
+source /etc/profile
+export PS1="(chroot) ${PS1}"
+
