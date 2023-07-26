@@ -18,7 +18,8 @@ from qtile_extras.widget.decorations import BorderDecoration
 # Variables:
 mod = "mod4"
 alt = "mod1"
-terminal = "qterm" 
+ctrl = "control"
+term = "qterm" 
 launcher = "qmenu"
 browser = "brave"
 gui_file_manager = "dolphin"
@@ -28,28 +29,66 @@ tui_file_manager = "alacritty -e ranger"
 
 keys = [
     # Launcher ------------
-    Key(
-        [mod], "d",
-        lazy.spawn(launcher),
-        desc="Launch rofi launcher"
-        ),
+    Key([mod], "d", lazy.spawn(launcher),
+        desc="Launch rofi launcher"),
+
+
+    # Control qtile ----------
+    Key([mod, ctrl], "r", lazy.reload_config(),
+        desc="Reload the config"),
+
+    Key([mod, ctrl], "s", lazy.restart(),
+        desc="Restart qtile"),
+
+    Key([mod, ctrl], "q", lazy.shutdown(),
+        desc="Shutdown qtile"),
+
 
     # Terminal -------------
-    Key(
-        [mod], "Return",
-        lazy.spawn(terminal),
-        desc="Launch terminal"
-        ),
-    Key(
-        [mod, "shift"], "Return",
-        lazy.spawn(terminal + ' --float'),
-        desc="Launch floating terminal"
-        ),
-    Key(
-        [mod, alt], "Return",
-        lazy.spawn(terminal + ' --full'),
-        desc="Launch fullscreen terminal"
-        ),
+    Key([mod], "Return", lazy.spawn(term),
+        desc="Launch terminal"),
+
+    Key([mod, "shift"], "Return", lazy.spawn(term + ' --float'),
+        desc="Launch floating terminal"),
+
+    Key([mod, alt], "Return", lazy.spawn(term + ' --full'),
+        desc="Launch fullscreen terminal"),
+
+
+    # Switch focus between windows
+    Key([mod], "Left", lazy.layout.left(),
+        desc="Move focus to left"),
+
+    Key([mod], "Right", lazy.layout.right(),
+        desc="Move focus to right"),
+
+    Key([mod], "Down", lazy.layout.down(),
+        desc="Move focus dowm"),
+
+    Key([mod], "Up", lazy.layout.up(),
+        desc="Move focus up"),
+
+    # Move windows between left/right columns or move up/down in current stack.
+    # Moving out of range in Columns layout will create new column.
+    Key([mod, "shift"], "Left", lazy.layout.shuffle_left(),
+        desc="Move window to left"),
+
+    Key([mod, "shift"], "Right", lazy.layout.shuffle_right(),
+        desc="Move window to right"),
+
+    Key([mod, "shift"], "Down", lazy.layout.shuffle_down(),
+        desc="Move window down"),
+
+    Key([mod, "shift"], "Up", lazy.layout.shuffle_up(),
+        desc="Move window up"),
+
+
+    # Toggle floating & fullscreen
+    Key([mod], "space", lazy.window.toggle_floating(),
+        desc="Toggle floating"),
+
+    Key([mod], "f", lazy.window.toggle_fullscreen(),
+        desc="Toggle fullscreen"),
 
 
     # Gui apps ----------
@@ -84,26 +123,12 @@ keys = [
             ),
     ]),
 
+    Key(
 
-	# Function keys : Volume --
-    Key(
-		[], "XF86AudioRaiseVolume", 
-		lazy.spawn(volume + ' --inc'),
-		desc="Raise speaker volume"	
-	),
-    Key(
-		[], "XF86AudioLowerVolume", 
-		lazy.spawn(volume + ' --dec'),
-		desc="Lower speaker volume"	
-	),
-    Key(
-		[], "XF86AudioMute", 
-		lazy.spawn(volume + ' --toggle'),
-		desc="Toggle mute"	
-	),
-    Key(
-		[], "XF86AudioMicMute", 
-		lazy.spawn(volume + ' --toggle-mic'),
-		desc="Toggle mute for mic"
-	),
+
+    
+        ),
+
+
+
 ]
