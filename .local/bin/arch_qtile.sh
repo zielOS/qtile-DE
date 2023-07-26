@@ -21,9 +21,11 @@ yay -S snapd
 yay -S zoom
 yay -S mullvad-vpn
 yay -S zramd
-
+yay -S nodejs-neovim
+yay -S eww-x11-git
+ 
 sudo systemctl set-default graphical.target 
-systemctl --user enable --now wireplumber.service pipewire-pulse.socket pipewire.socket pipewire-pulse.service pipewire.service pipewire-pulse.socket pipewire.socket pipewire-pulse.service pipewire.service emacs-28 && sudo systemctl enable zramd
+systemctl --user enable --now wireplumber.service pipewire-pulse.socket pipewire.socket pipewire-pulse.service pipewire.service pipewire-pulse.socket pipewire.socket pipewire-pulse.service pipewire.service emacs-28 && sudo systemctl enable zramd ckb-next-daemon
 
 
 cd && mkdir ~/.npm-global 

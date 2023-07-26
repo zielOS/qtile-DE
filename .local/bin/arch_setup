@@ -20,9 +20,14 @@ nvim /etc/default/grub
 GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=0562681b-e32b-43f0-845e-10101245eab7:cryptroot root=/dev/mapper/cryptroot lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
 
 *** systemd
-ln -sf ../usr/share/zoneinfo/canada/mountain /etc/localtime && nano /etc/locale.gen && locale-gen && eselect locale list && eselect locale set 4 && env-update && source /etc/profile && export ps1="(chroot) ${ps1}"
+ln -sf ../usr/share/zoneinfo/Canada/Mountain /etc/localtime && nvim /etc/locale.gen && locale-gen && echo "LANG=en_CA.UTF-8" >> /etc/locale.conf
 
-systemd-firstboot --prompt --setup-machine-id && systemctl enable NetworkManager fstrim.timer acpid systemd-timesyncd sysstat apparmor auditd 
+nvim /etc/mkinitcpio.conf && mkinitcpio -p linux-zen
+
+
+MODULES=(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm)
+
+systemd-firstboot --prompt --setup-machine-id && systemctl enable NetworkManager fstrim.timer systemd-timesyncd sysstat apparmor power-profiles-daemon 
 
 power-profiles-daemon nvidia-hibernate.service nvidia-suspend.service nvidia-resume.service nix-daemon
 
