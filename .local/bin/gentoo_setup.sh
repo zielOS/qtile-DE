@@ -267,7 +267,7 @@ genkernel --luks --menuconfig --install all
 
 
 ** miscellenous apps
-emerge -aq --jobs=10 app-arch/unzip app-arch/zip app-arch/unrar sys-fs/btrfs-progs sys-fs/dosfstools net-misc/wget net-misc/curl app-misc/ckb app-admin/sudo app-text/zathura app-text/zathura-meta dev-python/pynvim app-editors/neovim sys-apps/ripgrep dev-util/tree-sitter-cli sys-apps/fd app-shells/zsh app-shells/zsh-completions app-shells/gentoo-zsh-completions app-shells/zoxide app-shells/fzf dev-util/fnm dev-vcs/lazygit x11-misc/rofi x11-misc/dunst x11-misc/xsel x11-misc/xclip x11-drivers/nvidia-drivers app-forensics/aide sys-apps/rng-tools sys-apps/haveged app-forensics/lynis sys-process/audit app-admin/sysstat sys-process/acct sys-boot/grub sys-apps/mlocate app-misc/tmux x11-misc/picom x11-themes/papirus-icon-theme x11-misc/jgmenu app-portage/smart-live-rebuild app-portage/gentoolkit media-fonts/nerd-fonts x11-misc/gammastep net-im/discord app-text/xournalpp sys-power/power-profiles-daemon app-admin/stow net-misc/networkmanager x11-terms/alacritty app-misc/ranger app-misc/vifm kde-plasma/plasma-desktop kde-plasma/powerdevil kde-plasma/systemsettings kde-misc/krusader kde-apps/dolphin kde-apps/ark kde-apps/gwenview kde-apps/spectacle sys-apps/apparmor sys-apps/apparmor-utils sys-libs/libapparmor sec-policy/apparmor-profiles 
+emerge -av --jobs=10 app-arch/unzip app-arch/zip app-arch/unrar sys-fs/btrfs-progs sys-fs/dosfstools net-misc/wget net-misc/curl app-misc/ckb app-admin/sudo app-text/zathura app-text/zathura-meta dev-python/pynvim app-editors/neovim sys-apps/ripgrep dev-util/tree-sitter-cli sys-apps/fd app-shells/zsh app-shells/zsh-completions app-shells/gentoo-zsh-completions app-shells/zoxide app-shells/fzf dev-util/fnm dev-vcs/lazygit x11-misc/rofi x11-misc/dunst x11-misc/xsel x11-misc/xclip x11-drivers/nvidia-drivers app-forensics/aide sys-apps/rng-tools sys-apps/haveged app-forensics/lynis sys-process/audit app-admin/sysstat sys-process/acct sys-boot/grub sys-apps/mlocate app-misc/tmux x11-themes/papirus-icon-theme x11-misc/jgmenu app-portage/smart-live-rebuild app-portage/gentoolkit media-fonts/nerd-fonts x11-misc/gammastep net-im/discord app-text/xournalpp sys-power/power-profiles-daemon app-admin/stow net-misc/networkmanager x11-terms/alacritty app-misc/ranger app-misc/vifm sys-apps/apparmor sys-apps/apparmor-utils sys-libs/libapparmor sec-policy/apparmor-profiles x11-wm/qtile sys-devel/gcc:12 dev-util/nvidia-cuda-toolkit dev-libs/cudnn www-client/brave-bin media-sound/pamixer   
     
  
 ** custom ebuilds 9999
@@ -284,7 +284,7 @@ grub-install --target=x86_64-efi --efi-directory=/boot && grub-install --target=
 
 nvim /etc/default/grub
 :w
-GRUB_CMDLINE_LINUX="quiet crypt_root=UUID=079f44e8-5e4e-4d8f-afaa-568564527e1f root_trim=yes init=/lib/systemd/systemd"
+GRUB_CMDLINE_LINUX="quiet crypt_root=UUID=645e90a0-ebd5-483b-9813-25ecc2e26d74 root_trim=yes init=/lib/systemd/systemd"
 GRUB_CMDLINE_LINUX_DEFAULT="" 
 
 

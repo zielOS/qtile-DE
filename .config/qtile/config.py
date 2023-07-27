@@ -19,43 +19,61 @@ from qtile_extras.widget.decorations import BorderDecoration
 mod = "mod4"
 alt = "mod1"
 ctrl = "control"
-term = "qterm" 
-launcher = "qmenu"
-browser = "brave"
-gui_file_manager = "dolphin"
-gui_editor = "emacsclient -c -a emacs"
-tui_editor = "alacritty -e lvim"
-tui_file_manager = "alacritty -e ranger"
+
+
+# Scripts
+home = os.path.expanduser('~')
+terminal = home + '/.local/bin/qterm'
+volume = home + '/.local/bin/qvolume'
+launcher = home + '/.local/bin/qmenu'
+screenshot = home + '/.local/bin/qscreenshot'
+browser = 'brave'
+gui_file_manager = 'thunar'
+gui_editor = 'emacsclient -c -a emacs'
+tui_editor = 'alacritty -e lvim'
+tui_file_manager = 'alacritty -e ranger'
+notify_cmd = 'dunstify -u low -h string:x-dunst-stack-tag:qtileconfig'
 
 keys = [
-    # Launcher ------------
+    # Launcher ---------------------
     Key([mod], "d", lazy.spawn(launcher),
         desc="Launch rofi launcher"),
 
 
-    # Control qtile ----------
-    Key([mod, ctrl], "r", lazy.reload_config(),
+    # Kill window ---------------
+    Key([mod], "q", lazy.window.kill(),
+        desc="Kill active window"),
+
+
+    # Control qtile ---------------
+    Key([mod, ctrl], "r",
+        lazy.reload_config(),
+        lazy.spawn(notify_cmd + ' "Configuration Reloaded!"'),
         desc="Reload the config"),
 
-    Key([mod, ctrl], "s", lazy.restart(),
+    Key([mod, ctrl], "s",
+        lazy.restart(),
+        lazy.spawn(notify_cmd + ' "Restarting Qtile..."'),
         desc="Restart qtile"),
 
-    Key([mod, ctrl], "q", lazy.shutdown(),
+    Key([mod, ctrl], "q",
+        lazy.shutdown(),
+        lazy.spawn(notify_cmd + ' "Exiting Qtile..."'),
         desc="Shutdown qtile"),
 
 
     # Terminal -------------
-    Key([mod], "Return", lazy.spawn(term),
+    Key([mod], "Return", lazy.spawn(terminal),
         desc="Launch terminal"),
 
-    Key([mod, "shift"], "Return", lazy.spawn(term + ' --float'),
+    Key([mod, "shift"], "Return", lazy.spawn(terminal + ' --float'),
         desc="Launch floating terminal"),
 
-    Key([mod, alt], "Return", lazy.spawn(term + ' --full'),
+    Key([mod, alt], "Return", lazy.spawn(terminal + ' --full'),
         desc="Launch fullscreen terminal"),
 
 
-    # Switch focus between windows
+    # Switch focus --------------------
     Key([mod], "Left", lazy.layout.left(),
         desc="Move focus to left"),
 
@@ -68,8 +86,8 @@ keys = [
     Key([mod], "Up", lazy.layout.up(),
         desc="Move focus up"),
 
-    # Move windows between left/right columns or move up/down in current stack.
-    # Moving out of range in Columns layout will create new column.
+
+    # Move windows -----------------------------------
     Key([mod, "shift"], "Left", lazy.layout.shuffle_left(),
         desc="Move window to left"),
 
@@ -83,7 +101,7 @@ keys = [
         desc="Move window up"),
 
 
-    # Toggle floating & fullscreen
+    # Toggle floating & fullscreen ----------------------
     Key([mod], "space", lazy.window.toggle_floating(),
         desc="Toggle floating"),
 
@@ -91,43 +109,47 @@ keys = [
         desc="Toggle fullscreen"),
 
 
+    # Control volume ----------------------------
+    Key([], "XF86AudioRaiseVolume", lazy.spawn(volume + ' --up'),
+        desc="Raise speaker volume"),
+
+    Key([], "XF86AudioLowerVolume", lazy.spawn(volume + ' --down'),
+        desc="Lower speaker volume"),
+
+    Key([], "XF86AudioMute", lazy.spawn(volume + ' --toggle'),
+        desc="Toggle audio mute"),
+
+
+    # Screenshot
+    Key([], "Print", lazy.spawn(screenshot + ' --full'),
+        desc="Take full screenshot"),
+
+    Key([mod], "Print", lazy.spawn(screenshot + ' --crop'),
+        desc="Take screenshot of region"),
+
+
+
     # Gui apps ----------
     KeyChord([mod], "g", [
-        Key(
-            [], "b",
-            lazy.spawn(browser),
-            desc="Launch web browser"
-            ),
-        Key(
-            [], "f",
-            lazy.spawn(gui_file_manager),
-            desc="Launch file-manager"
-            ),
-        Key(
-            [], "e",
-            lazy.spawn(gui_editor),
-            desc="Launch emacs"
-            ),
+        Key([], "b", lazy.spawn(browser),
+            desc="Launch web browser"),
+
+        Key([], "f", lazy.spawn(gui_file_manager),
+            desc="Launch file-manager"),
+
+        Key([], "e", lazy.spawn(gui_editor),
+            desc="Launch emacs"),
     ]),
+
 
     # Tui apps ----------------------
     KeyChord([mod], "t", [
-        Key(
-            [], "l",
-            lazy.spawn(tui_editor),
-            desc="Launch lvim"
-            ),
-        Key(
-            [], "r",
-            lazy.spawn(tui_file_manager),
-            ),
+        Key([], "l", lazy.spawn(tui_editor),
+            desc="Launch lvim"),
+
+        Key([], "r", lazy.spawn(tui_file_manager),
+            desc="Launch ranger"),
     ]),
-
-    Key(
-
-
-    
-        ),
 
 
 
