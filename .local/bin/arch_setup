@@ -1,5 +1,24 @@
+#!/bin/bash
+
 *** BTRFS
-cfdisk /dev/nvme0n1 && mkfs.vfat -F 32 /dev/nvme0n1p1 && cryptsetup -c aes-xts-plain64 -s 512 -y luksFormat /dev/nvme0n1p2 && cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mkfs.btrfs /dev/mapper/cryptroot && mount /dev/mapper/cryptroot /mnt/arch && btrfs su cr /mnt/arch/@  && btrfs su cr /mnt/arch/@home && btrfs su cr /mnt/arch/@opt && btrfs su cr /mnt/arch/@tmp && btrfs su cr /mnt/arch/@var && btrfs su cr /mnt/arch/@log &&  btrfs su cr /mnt/arch/@audit  && btrfs su cr /mnt/arch/@snapshots && umount /mnt/arch && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt/arch && mkdir /mnt/arch/home && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/arch/home && mkdir /mnt/arch/opt && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@opt /dev/mapper/cryptroot /mnt/arch/opt  && mkdir /mnt/arch/tmp && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@tmp /dev/mapper/cryptroot /mnt/arch/tmp && mkdir /mnt/arch/var && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/arch/var && mkdir /mnt/arch/var/log && mount -o nmoatime,compress=zstd,space_cache=v2,discard=async,subvol=@log /dev/mapper/cryptroot /mnt/arch/var/log && mkdir /mnt/arch/var/log/audit && mount -o nmoatime,compress=zstd,space_cache=v2,discard=async,subvol=@audit /dev/mapper/cryptroot /mnt/arch/var/log/audit && mkdir /mnt/arch/.snapshots && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/cryptroot /mnt/arch/.snapshots 
+ cfdisk /dev/nvme0n1 && mkfs.vfat -F 32 /dev/nvme0n1p1 && cryptsetup -c aes-xts-plain64 -s 512 -y luksFormat /dev/nvme0n1p2 && cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mkfs.btrfs /dev/mapper/cryptroot && mkdir /mnt/arch && mount /dev/mapper/cryptroot /mnt/arch 
+
+
+btrfs subvolume create /mnt/arch/@ && btrfs subvolume create /mnt/arch/@/.snapshots && mkdir /mnt/arch/@/.snapshots/1 && btrfs subvolume create /mnt/arch/@/.snapshots/1/snapshot && mkdir -p /mnt/arch/@/boot/grub/ && btrfs subvolume create /mnt/arch/@/boot/grub/i386-pc && btrfs subvolume create /mnt/arch/@/boot/grub/x86_64-efi && btrfs subvolume create /mnt/arch/@/home && btrfs subvolume create /mnt/arch/@/opt && btrfs subvolume create /mnt/arch/@/root && btrfs subvolume create /mnt/arch/@/srv && btrfs subvolume create /mnt/arch/@/tmp && mkdir /mnt/arch/@/usr/ && btrfs subvolume create /mnt/arch/@/usr/local && btrfs subvolume create /mnt/arch/@/var && btrfs subvolume create /mnt/arch/@/var/log && btrfs subvolume create /mnt/arch/@/var/log/audit && chattr +c /mnt/arch/@/var && nvim /mnt/arch/@/.snapshots/1/info.xml
+
+<?xml version="1.0"?>
+<snapshot>
+  <type>single</type>
+  <num>1</num>
+  <date>$DATE</date>
+  <description>first root filesystem</description>
+</snapshot>
+
+btrfs subvolume set-default $(btrfs subvolume list /mnt/arch | grep "@/.snapshots/1/snapshot" | grep -oP '(?<=ID )[0-9]+') /mnt/arch && umount /mnt/arch
+
+mkdir /mnt/arch/.snapshots && mkdir -p /mnt/arch/boot/grub/i386-pc && mkdir -p /mnt/arch/boot/grub/x86_64-efi && mkdir /mnt/arch/home && mkdir /mnt/arch/opt && mkdir /mnt/arch/root && mkdir /mnt/arch/srv && mkdir /mnt/arch/tmp && mkdir -p /mnt/arch/usr/local && mkdir -p /mnt/arch/var/log/audit 
+
+mount /dev/mapper/cryptroot /mnt/arch -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ && mount /dev/mapper/cryptroot /mnt/arch/.snapshots -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/.snapshots && mount /dev/mapper/cryptroot /mnt/arch/boot/grub/i386-pc -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/boot/grub/i386-pc && mount /dev/mapper/cryptroot /mnt/arch/boot/grub/x86_64-efi -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/boot/grub/x86_64-efi && mount /dev/mapper/cryptroot /mnt/arch/home -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/home && mount /dev/mapper/cryptroot /mnt/arch/opt -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/opt && mount /dev/mapper/cryptroot /mnt/arch/root -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/root && mount /dev/mapper/cryptroot /mnt/arch/srv -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/srv && mount /dev/mapper/cryptroot /mnt/arch/tmp -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/tmp && mount /dev/mapper/cryptroot /mnt/arch/usr/local -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/usr/local && mount /dev/mapper/cryptroot /mnt/arch/var -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/var && mount /dev/mapper/cryptroot /mnt/arch/var/log -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/var/log && mount /dev/mapper/cryptroot /mnt/arch/var/log/audit -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/var/log/audit
 
 pacstrap /mnt/arch linux-zen linux-zen-headers base base-devel git neovim linux-firmware intel-ucode arch-install-scripts mkinitcpio reflector
 
@@ -27,9 +46,7 @@ nvim /etc/mkinitcpio.conf && mkinitcpio -p linux-zen
 
 MODULES=(btrfs nvidia nvidia_modeset nvidia_uvm nvidia_drm)
 
-systemd-firstboot --prompt --setup-machine-id && systemctl enable NetworkManager fstrim.timer systemd-timesyncd sysstat apparmor power-profiles-daemon 
-
-power-profiles-daemon nvidia-hibernate.service nvidia-suspend.service nvidia-resume.service nix-daemon
+systemd-firstboot --prompt --setup-machine-id && systemctl enable NetworkManager fstrim.timer systemd-timesyncd sysstat apparmor power-profiles-daemon power-profiles-daemon nvidia-hibernate.service nvidia-suspend.service nvidia-resume.service
 
 nvim /etc/modprobe.d/nvidia.conf
 options nvidia-drm modeset=1 
@@ -96,12 +113,12 @@ WantedBy=multi-user.target
 
 
  
-emaint sync -r gentoo
+emaint sync -r arch
 
 # Post-install chroot
-cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt/gentoo && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/gentoo/home  && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@opt /dev/mapper/cryptroot /mnt/gentoo/opt && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@tmp /dev/mapper/cryptroot /mnt/gentoo/tmp && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/gentoo/var && mount -o nmoatime,compress=zstd,space_cache=v2,discard=async,subvol=@log /dev/mapper/cryptroot /mnt/gentoo/var/log && mount -o nmoatime,compress=zstd,space_cache=v2,discard=async,subvol=@audit /dev/mapper/cryptroot /mnt/gentoo/var/log/audit && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/cryptroot /mnt/gentoo/.snapshots && cd /mnt/gentoo && mkdir --parents /mnt/gentoo/etc/portage/repos.conf && cp /mnt/gentoo/usr/share/portage/config/repos.conf /mnt/gentoo/etc/portage/repos.conf/gentoo.conf && cp --dereference /etc/resolv.conf /mnt/gentoo/etc/ && mount --types proc /proc /mnt/gentoo/proc && mount --rbind /sys /mnt/gentoo/sys && mount --make-rslave /mnt/gentoo/sys && mount --rbind /dev /mnt/gentoo/dev && mount --make-rslave /mnt/gentoo/dev && mount --bind /run /mnt/gentoo/run && mount --make-slave /mnt/gentoo/run && test -L /dev/shm && rm /dev/shm && mkdir /dev/shm && mount -t tmpfs -o nosuid,nodev,noexec shm /dev/shm && chmod 1777 /dev/shm
+cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ /dev/mapper/cryptroot /mnt/arch && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@home /dev/mapper/cryptroot /mnt/arch/home  && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@opt /dev/mapper/cryptroot /mnt/arch/opt && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@tmp /dev/mapper/cryptroot /mnt/arch/tmp && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@var /dev/mapper/cryptroot /mnt/arch/var && mount -o nmoatime,compress=zstd,space_cache=v2,discard=async,subvol=@log /dev/mapper/cryptroot /mnt/arch/var/log && mount -o nmoatime,compress=zstd,space_cache=v2,discard=async,subvol=@audit /dev/mapper/cryptroot /mnt/arch/var/log/audit && mount -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@snapshots /dev/mapper/cryptroot /mnt/arch/.snapshots && cd /mnt/arch && mkdir --parents /mnt/arch/etc/portage/repos.conf && cp /mnt/arch/usr/share/portage/config/repos.conf /mnt/arch/etc/portage/repos.conf/arch.conf && cp --dereference /etc/resolv.conf /mnt/arch/etc/ && mount --types proc /proc /mnt/arch/proc && mount --rbind /sys /mnt/arch/sys && mount --make-rslave /mnt/arch/sys && mount --rbind /dev /mnt/arch/dev && mount --make-rslave /mnt/arch/dev && mount --bind /run /mnt/arch/run && mount --make-slave /mnt/arch/run && test -L /dev/shm && rm /dev/shm && mkdir /dev/shm && mount -t tmpfs -o nosuid,nodev,noexec shm /dev/shm && chmod 1777 /dev/shm
 
-chroot /mnt/gentoo /bin/bash
+chroot /mnt/arch /bin/bash
 source /etc/profile
 export PS1="(chroot) ${PS1}"
 

@@ -260,7 +260,7 @@ chroot /mnt/gentoo /bin/bash
 source /etc/profile
 export PS1="(chroot) ${PS1}"
 
-emerge-webrsync && emerge --sync --quiet && emerge -aq app-eselect/eselect-repository dev-vcs/git --jobs=10 && eselect repository remove gentoo && eselect repository add gentoo git https://github.com/gentoo-mirror/gentoo.git  && emaint sync -r gentoo && eselect repository enable guru brave-overlay lto-overlay mv CachyOS-kernels && emerge --sync && emerge -aq ltoize lto-rebuild && lto-rebuild -r
+emerge-webrsync && emerge --sync --quiet && emerge -aq app-eselect/eselect-repository dev-vcs/git --jobs=10 && eselect repository remove gentoo && eselect repository add gentoo git https://github.com/gentoo-mirror/gentoo.git  && emaint sync -r gentoo && eselect repository enable guru brave-overlay lto-overlay mv CachyOS-kernels && emerge --sync && emerge -aq ltoize lto-rebuild --jobs=10 && lto-rebuild -r
 
 * gcc upgrade
 emerge -aq sys-devel/gcc && eselect gcc list && eselect gcc set 2 && lto-rebuild -r && emerge --ask --oneshot --usepkg=n sys-devel/libtool && emerge -eq --usepkg=n @world --jobs=10 --keep-going --exclude gcc
@@ -277,7 +277,7 @@ ln -sf ../usr/share/zoneinfo/Canada/Mountain /etc/localtime && nano -w /etc/loca
 emerge --sync && emerge -auvDN @world
 
 * kernel setup
-emerge -aq sys-kernel/cachyos-sources sys-fs/genfstab  sys-kernel/linux-firmware sys-kernel/linux-headers sys-kernel/genkernel sys-apps/fwupd sys-fs/cryptsetup sys-firmware/intel-microcode --jobs=10 && eselect kernel set 1 && ls -l /usr/src/linux 
+emerge -aq sys-kernel/xanmod-sources sys-fs/genfstab  sys-kernel/linux-firmware sys-kernel/linux-headers sys-kernel/genkernel sys-apps/fwupd sys-fs/cryptsetup sys-firmware/intel-microcode --jobs=10 && eselect kernel set 1 && ls -l /usr/src/linux 
 
 genfstab -U / >> /etc/fstab
 
@@ -287,7 +287,7 @@ genkernel --luks --menuconfig --install all
 ** miscellenous apps
 grub-install --target=x86_64-efi --efi-directory=/boot && grub-install --target=x86_64-efi --efi-directory=/boot --removable && grub-mkconfig -o /boot/grub/grub.cfg
 
-emerge -aq  app-arch/unzip app-arch/zip app-arch/unrar sys-fs/btrfs-progs sys-fs/dosfstools net-misc/wget net-misc/curl app-misc/ckb app-admin/sudo app-text/zathura app-text/zathura-meta dev-python/pynvim app-editors/neovim sys-apps/ripgrep dev-util/tree-sitter-cli sys-apps/fd app-shells/zsh app-shells/zsh-completions app-shells/gentoo-zsh-completions app-shells/zoxide app-shells/fzf dev-util/fnm dev-vcs/lazygit x11-misc/rofi x11-misc/dunst x11-misc/xsel x11-misc/xclip  app-forensics/aide sys-apps/rng-tools sys-apps/haveged app-forensics/lynis sys-process/audit app-admin/sysstat sys-process/acct sys-boot/grub sys-apps/mlocate app-misc/tmux x11-themes/papirus-icon-theme x11-misc/jgmenu app-portage/smart-live-rebuild app-portage/gentoolkit media-fonts/nerd-fonts x11-misc/gammastep net-im/discord app-text/xournalpp sys-power/power-profiles-daemon app-admin/stow net-misc/networkmanager x11-terms/kitty x11-terms/kitty-terminfo x11-terms/kitty-shell-integration app-misc/ranger app-misc/vifm sys-apps/apparmor sys-apps/apparmor-utils sys-libs/libapparmor sec-policy/apparmor-profiles x11-wm/qtile media-sound/pamixer kde-misc/krusader lxqt-base/lxqt-meta gui-apps/eww x11-apps/setxkbmap sci-misc/jupyterlab-desktop-bin sci-chemistry/pymol dev-python/chardet dev-python/pillow app-arch/atool net-im/zoom app-admin/keepassxc
+emerge -aq  app-arch/unzip app-arch/zip app-arch/unrar sys-fs/btrfs-progs sys-fs/dosfstools net-misc/wget net-misc/curl app-misc/ckb app-admin/sudo app-text/zathura app-text/zathura-meta dev-python/pynvim app-editors/neovim sys-apps/ripgrep dev-util/tree-sitter-cli sys-apps/fd app-shells/zsh app-shells/zsh-completions app-shells/gentoo-zsh-completions app-shells/zoxide app-shells/fzf dev-util/fnm dev-vcs/lazygit x11-misc/rofi x11-misc/dunst x11-misc/xsel x11-misc/xclip  app-forensics/aide sys-apps/rng-tools sys-apps/haveged app-forensics/lynis sys-process/audit app-admin/sysstat sys-process/acct sys-boot/grub sys-apps/mlocate app-misc/tmux x11-themes/papirus-icon-theme x11-misc/jgmenu app-portage/smart-live-rebuild app-portage/gentoolkit media-fonts/nerd-fonts x11-misc/gammastep net-im/discord app-text/xournalpp sys-power/power-profiles-daemon app-admin/stow net-misc/networkmanager x11-terms/kitty x11-terms/kitty-terminfo x11-terms/kitty-shell-integration app-misc/ranger app-misc/vifm sys-apps/apparmor sys-apps/apparmor-utils sys-libs/libapparmor sec-policy/apparmor-profiles media-sound/pamixer kde-misc/krusader  x11-apps/setxkbmap sci-misc/jupyterlab-desktop-bin sci-chemistry/pymol dev-python/chardet dev-python/pillow app-arch/atool net-im/zoom app-admin/keepassxc
 
 
  
