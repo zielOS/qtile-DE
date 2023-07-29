@@ -4,17 +4,26 @@
 export XDG_CONFIG_HOME=$HOME/.config
 export XDG_CACHE_HOME=$HOME/.cache
 export XDG_DATA_HOME=$HOME/.local/share
+export GDK_SCALE=1.8
+export GDK_DPI_SCALE=1.5
+export ELM_SCALE=1.5
 export QT_QPA_PLATFORMTHEME=qt5ct
-export PATH=$PATH:/usr/local/texlive/2022/bin/x86_64-linux
-export MANPATH=$MANPATH:/usr/local/texlive/2022/texmf-dist/doc/man
-export INFOPATH=$INFOPATH/usr/local/texlive/2022/texmf-dist/doc/info
+export PATH=$PATH:$HOME/.cargo/bin
+export PATH=$PATH:$HOME/.local/bin
+export PATH=$PATH:$HOME/.config/emacs/bin
+export PATH=$PATH:$HOME/.npm-global/bin
+export PATH=$PATH:/usr/local/texlive/2023/bin/x86_64-linux
+export MANPATH=$MANPATH:/usr/local/texlive/2023/texmf-dist/doc/man
+export INFOPATH=$INFOPATH/usr/local/texlive/2023/texmf-dist/doc/infoexport
 
 # Kill already running process
-_ps=(picom dunst xfce4-power-manager lxpolkit)
-for _prs in "${_ps[@]}"; do
-	if [[ `pidof ${_prs}` ]]; then
-		killall -9 ${_prs}
-	fi
+
+processes=( "picom" "dunst" "eww" "gammastep" "polkit-gnome-authentication-agent-1" "xrandr" )
+
+for process in "${processes[@]}"; do
+if pidof -q "$process"; then
+  pkill -9 -x "$process" > /dev/null; sleep 0.1
+fi
 done
 
 
@@ -23,26 +32,24 @@ xsetroot -cursor_name left_ptr &
 
 # Compositor
 while pgrep -u $UID -x picom >/dev/null; do sleep 1; done
-picom --config /home/ahsan/.config/picom/picom.conf &
+picom --config $HOME/.config/picom/picom.conf &
 
-# Restore wallpaper
-feh --bg-fill "$HOME/.config/wallpapers/wallpaper.png"
+## Disable capslock
+setxkbmap -option ctrl:nocaps &
 
-xrandr --output DP-0 --off --output DP-1 --off --output DP-0 --scale 0.9x0.9 --mode 2560x1440 --pos 0x0 --rotate normal --output DP-2 --scale 0.9x0.9 --primary --mode 3440x1440 --pos 2304x0 --rotate normal --output DP-4 --scale 0.9x0.9 --mode 2560x1440 --pos 5400x0 --rotate normal --output USB-C-0 --off &
+# polkit
+/usr/libexec/polkit-gnome-authentication-agent-1 &
 
 ## Launch notification daemon
 dunst -config /home/ahsan/.config/dunst/dunstrc &
 
 xrdb merge ~/.Xresources 
 
-~/git/chadwm/scripts/bar.sh &
+# setup display settings
+gammastep -l 48.1:11.6 -b 0.9:0.9 -t 5700:5700 &
 
 ## Launch apps
 ckb-next &
 insync start &
-gummy start 
-gummy -b 85 -t 5700
 eww -daemon &
 
-# Launch DWM
-while dwm; [ $? -ne 0  ]; do echo "start dwm"; done

@@ -1,156 +1,113 @@
 
-# -*- coding: utf-8 -*-
-import os
-import re
-import socket
-import subprocess
-from libqtile import qtile
-from libqtile.config import Click, Drag, Group, KeyChord, Key, Match, Screen
-from libqtile.command import lazy
-from libqtile import layout, bar, widget, hook
+from libqtile.config import Key, KeyChord
 from libqtile.lazy import lazy
-from libqtile.utils import guess_terminal
-from typing import List  # noqa: F401
 
-from qtile_extras import widget
-from qtile_extras.widget.decorations import BorderDecoration
+# Mouse
+from libqtile.config import Click, Drag
 
-# Variables:
-mod = "mod4"
-alt = "mod1"
-ctrl = "control"
+# Groups
+from libqtile.config import Group, Match
 
+# Layouts
+from libqtile import layout
 
-# Scripts
-home = os.path.expanduser('~')
-terminal = home + '/.local/bin/qterm'
-volume = home + '/.local/bin/qvolume'
-launcher = home + '/.local/bin/qmenu'
-screenshot = home + '/.local/bin/qscreenshot'
-browser = 'brave'
-gui_file_manager = 'thunar'
-gui_editor = 'emacsclient -c -a emacs'
-tui_editor = 'alacritty -e lvim'
-tui_file_manager = 'alacritty -e ranger'
-notify_cmd = 'dunstify -u low -h string:x-dunst-stack-tag:qtileconfig'
+# Screens
+from libqtile.config import Screen
+from libqtile import bar, widget
 
-keys = [
-    # Launcher ---------------------
-    Key([mod], "d", lazy.spawn(launcher),
-        desc="Launch rofi launcher"),
+# ScratchPad and DropDown
+from libqtile.config import ScratchPad, DropDown
+
+# Startup
+import os
+import subprocess
+from libqtile import hook
 
 
-    # Kill window ---------------
-    Key([mod], "q", lazy.window.kill(),
-        desc="Kill active window"),
-
-
-    # Control qtile ---------------
-    Key([mod, ctrl], "r",
-        lazy.reload_config(),
-        lazy.spawn(notify_cmd + ' "Configuration Reloaded!"'),
-        desc="Reload the config"),
-
-    Key([mod, ctrl], "s",
-        lazy.restart(),
-        lazy.spawn(notify_cmd + ' "Restarting Qtile..."'),
-        desc="Restart qtile"),
-
-    Key([mod, ctrl], "q",
-        lazy.shutdown(),
-        lazy.spawn(notify_cmd + ' "Exiting Qtile..."'),
-        desc="Shutdown qtile"),
-
-
-    # Terminal -------------
-    Key([mod], "Return", lazy.spawn(terminal),
-        desc="Launch terminal"),
-
-    Key([mod, "shift"], "Return", lazy.spawn(terminal + ' --float'),
-        desc="Launch floating terminal"),
-
-    Key([mod, alt], "Return", lazy.spawn(terminal + ' --full'),
-        desc="Launch fullscreen terminal"),
-
-
-    # Switch focus --------------------
-    Key([mod], "Left", lazy.layout.left(),
-        desc="Move focus to left"),
-
-    Key([mod], "Right", lazy.layout.right(),
-        desc="Move focus to right"),
-
-    Key([mod], "Down", lazy.layout.down(),
-        desc="Move focus dowm"),
-
-    Key([mod], "Up", lazy.layout.up(),
-        desc="Move focus up"),
-
-
-    # Move windows -----------------------------------
-    Key([mod, "shift"], "Left", lazy.layout.shuffle_left(),
-        desc="Move window to left"),
-
-    Key([mod, "shift"], "Right", lazy.layout.shuffle_right(),
-        desc="Move window to right"),
-
-    Key([mod, "shift"], "Down", lazy.layout.shuffle_down(),
-        desc="Move window down"),
-
-    Key([mod, "shift"], "Up", lazy.layout.shuffle_up(),
-        desc="Move window up"),
-
-
-    # Toggle floating & fullscreen ----------------------
-    Key([mod], "space", lazy.window.toggle_floating(),
-        desc="Toggle floating"),
-
-    Key([mod], "f", lazy.window.toggle_fullscreen(),
-        desc="Toggle fullscreen"),
-
-
-    # Control volume ----------------------------
-    Key([], "XF86AudioRaiseVolume", lazy.spawn(volume + ' --up'),
-        desc="Raise speaker volume"),
-
-    Key([], "XF86AudioLowerVolume", lazy.spawn(volume + ' --down'),
-        desc="Lower speaker volume"),
-
-    Key([], "XF86AudioMute", lazy.spawn(volume + ' --toggle'),
-        desc="Toggle audio mute"),
-
-
-    # Screenshot
-    Key([], "Print", lazy.spawn(screenshot + ' --full'),
-        desc="Take full screenshot"),
-
-    Key([mod], "Print", lazy.spawn(screenshot + ' --crop'),
-        desc="Take screenshot of region"),
+## Startup ------------------------------
+@hook.subscribe.startup_once
+def autostart():
+    home = os.path.expanduser('~')
+    subprocess.Popen([home + '/.local/bin/qstart'])
 
 
 
-    # Gui apps ----------
-    KeyChord([mod], "g", [
-        Key([], "b", lazy.spawn(browser),
-            desc="Launch web browser"),
-
-        Key([], "f", lazy.spawn(gui_file_manager),
-            desc="Launch file-manager"),
-
-        Key([], "e", lazy.spawn(gui_editor),
-            desc="Launch emacs"),
-    ]),
 
 
-    # Tui apps ----------------------
-    KeyChord([mod], "t", [
-        Key([], "l", lazy.spawn(tui_editor),
-            desc="Launch lvim"),
+NUM_SCREENS = 3
+NUM_GROUPS = 8
+GROUP_MAP = {}
+GROUP_LIST = []
 
-        Key([], "r", lazy.spawn(tui_file_manager),
-            desc="Launch ranger"),
-    ]),
+# Here we create two objects:
+# 1) A dict, "GROUP_MAP", which has a key relating to the screen index. The value is another dict
+#    where groups are numbered from 1 to NUM_GROUPS. The value is a unique group name.
+# 2) A list of all groups. Each group has a unique name but the label is between 1 and NUM_GROUPS
+for screen in range(NUM_SCREENS):
+    screen_dict = {}
+    for group in range(NUM_GROUPS):
+        name = f"{screen * NUM_GROUPS + group}"
+        group_num = group + 1
+        screen_dict[group_num] = name
+        GROUP_LIST.append(Group(name, label=str(group_num)))
+    GROUP_MAP[screen] = screen_dict
+
+@lazy.function
+def switch_group(qtile, group_num):
+    """
+    This function looks up the unique group name for group number on the current screen
+    and then displays that group.
+    """
+    group_name = GROUP_MAP[qtile.current_screen.index + 1][group_num]
+    qtile.groups_map[group_name].toscreen()
 
 
+@lazy.window.function
+def move_window_to_group(window, group_num, switch_group=False, toggle=False):
+    """
+    This function looks up the unique group name for group number on the current screen
+    and then moves the window to that group.
+    """   
+    group_name = GROUP_MAP[window.qtile.current_screen.index + 1][group_num]
+    window.togroup(group_name, switch_group, toggle)
 
-]
+# Groups should be set to our group list
+groups = GROUP_LIST
+
+# We bind keys mod + 1-8 to call our function to display a group depending on the focused screen
+# mod + shift + 1-8 moves window to that group on the active screen
+for i in range(NUM_GROUPS):
+    keys.append(Key([mod], str(i + 1), switch_group(i + 1)))
+    keys.append(Key([mod, "shift"], str(i + 1), move_window_to_group(i + 1, switch_group=True)))
+
+# mod + control + 1-3 moves window to current group on that screen
+for i in range(NUM_SCREENS):
+    keys.append(Key([mod, "control"], str(i + 1), lazy.window.toscreen(i)))
+
+    # def init_keys_groups(self, group_names):
+    # """
+    # Create bindings to move between groups
+    # """
+    # @lazy.function
+    # def switch_groups(qtile, group_name):
+    #     current_screen_index = qtile.screens.index(qtile.current_screen)
+    #     layout_index = "monadtall"
+    #     if current_screen_index == 0:
+    #         layout_index = "monadtall"
+    #     elif current_screen_index > 0:
+    #         layout_index = "monadwide"
+    #     for g in qtile.groups:
+    #         if g.name == group_name:
+    #             # change to g.tooscreen() when it's released from git
+    #             g.cmd_toscreen()
+    #             # change to qtile.cmd_to_layout_index when it's released from git
+    #             g.cmd_setlayout(layout_index)
+    #             return
+
+    # group_keys = []
+    # for group_name in group_names:
+    #     index = (group_name[0]).lower()
+    #     group_keys += [Key([MOD], index, switch_groups(group_name)), Key(
+    #         [MOD, SHIFT], index, lazy.window.togroup(group_name, switch_group=False))]
+
+    # return group_keys
