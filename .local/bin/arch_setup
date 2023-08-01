@@ -1,10 +1,8 @@
 #!/bin/bash
 
-*** BTRFS
- cfdisk /dev/nvme0n1 && mkfs.vfat -F 32 /dev/nvme0n1p1 && cryptsetup -c aes-xts-plain64 -s 512 -y luksFormat /dev/nvme0n1p2 && cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mkfs.btrfs /dev/mapper/cryptroot && mkdir /mnt/arch && mount /dev/mapper/cryptroot /mnt/arch 
+**** BTRFS
+cfdisk /dev/nvme0n1 && mkfs.vfat -F 32 /dev/nvme0n1p1 && cryptsetup -c aes-xts-plain64 -s 512 -y luksFormat /dev/nvme0n1p2 && cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mkfs.btrfs /dev/mapper/cryptroot && mkdir /mnt/arch && mount /dev/mapper/cryptroot /mnt/arch && btrfs subvolume create /mnt/arch/@ && btrfs subvolume create /mnt/arch/@/.snapshots && mkdir /mnt/arch/@/.snapshots/1 && btrfs subvolume create /mnt/arch/@/.snapshots/1/snapshot && mkdir -p /mnt/arch/@/boot/grub/ && btrfs subvolume create /mnt/arch/@/boot/grub/i386-pc && btrfs subvolume create /mnt/arch/@/boot/grub/x86_64-efi && btrfs subvolume create /mnt/arch/@/home && btrfs subvolume create /mnt/arch/@/opt && btrfs subvolume create /mnt/arch/@/root && btrfs subvolume create /mnt/arch/@/srv && btrfs subvolume create /mnt/arch/@/tmp && mkdir /mnt/arch/@/usr/ && btrfs subvolume create /mnt/arch/@/usr/local && btrfs subvolume create /mnt/arch/@/var && btrfs subvolume create /mnt/arch/@/var/log && btrfs subvolume create /mnt/arch/@/var/log/audit && chattr +c /mnt/arch/@/var && nvim /mnt/arch/@/.snapshots/1/info.xml
 
-
-btrfs subvolume create /mnt/arch/@ && btrfs subvolume create /mnt/arch/@/.snapshots && mkdir /mnt/arch/@/.snapshots/1 && btrfs subvolume create /mnt/arch/@/.snapshots/1/snapshot && mkdir -p /mnt/arch/@/boot/grub/ && btrfs subvolume create /mnt/arch/@/boot/grub/i386-pc && btrfs subvolume create /mnt/arch/@/boot/grub/x86_64-efi && btrfs subvolume create /mnt/arch/@/home && btrfs subvolume create /mnt/arch/@/opt && btrfs subvolume create /mnt/arch/@/root && btrfs subvolume create /mnt/arch/@/srv && btrfs subvolume create /mnt/arch/@/tmp && mkdir /mnt/arch/@/usr/ && btrfs subvolume create /mnt/arch/@/usr/local && btrfs subvolume create /mnt/arch/@/var && btrfs subvolume create /mnt/arch/@/var/log && btrfs subvolume create /mnt/arch/@/var/log/audit && chattr +c /mnt/arch/@/var && nvim /mnt/arch/@/.snapshots/1/info.xml
 
 <?xml version="1.0"?>
 <snapshot>
@@ -27,16 +25,16 @@ arch-chroot /mnt/arch
 mount /dev/nvme0n1p1 /boot
 genfstab -U / >> /etc/fstab
 
-reflector --verbose --country 'CA,US' -l 25 --sort rate --save /etc/pacman.d/mirrorlist
+reflector --verbose --country 'Canada' -l 25 --sort rate --save /etc/pacman.d/mirrorlist
 
-pacman -S unzip zip unrar btrfs-progs dosfstools wget curl neofetch upower zathura zathura-pdf-poppler python-pynvim neovim ripgrep fd zsh zsh-completions zoxide fzf fuse flatpak lazygit xdg-user-dirs xdg-user-dirs-gtk xdg-utils gvfs rofi dunst flameshot xsel xclip xorg-xsetroot xorg-server nvidia-dkms nvidia-utils nvidia-settings mesa rng-tools haveged lynis firejail audit sysstat apparmor grub mlocate imv tmux tldr linux-zen linux-zen-headers lxqt-session lxqt-sudo lxqt-powermanagement lxqt-policykit lxqt-config ark alacritty gwenview dolphin 
+pacman -S unzip zip unrar btrfs-progs dosfstools wget curl neofetch upower zathura zathura-pdf-poppler python-pynvim neovim ripgrep fd zsh zsh-completions zoxide fzf fuse flatpak lazygit xdg-user-dirs xdg-user-dirs-gtk xdg-utils gvfs rofi dunst flameshot xsel xclip xorg-xsetroot xorg-server nvidia-dkms nvidia-utils nvidia-settings mesa rng-tools haveged lynis firejail audit sysstat apparmor grub mlocate imv tmux tealdeer linux-zen linux-zen-headers kitty ranger vifm 
 
 passwd && useradd -m -G users,wheel,audio,video -s /bin/bash ahsan && passwd ahsan && EDITOR=nvim visudo
 
 grub-install --target=x86_64-efi --efi-directory=/boot && grub-install --target=x86_64-efi --efi-directory=/boot --removable && grub-mkconfig -o /boot/grub/grub.cfg
 
 nvim /etc/default/grub
-GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=0562681b-e32b-43f0-845e-10101245eab7:cryptroot root=/dev/mapper/cryptroot lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=ce3c71ec-73d5-434a-91ee-a6346038c7da:cryptroot root=/dev/mapper/cryptroot lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
 
 *** systemd
 ln -sf ../usr/share/zoneinfo/Canada/Mountain /etc/localtime && nvim /etc/locale.gen && locale-gen && echo "LANG=en_CA.UTF-8" >> /etc/locale.conf

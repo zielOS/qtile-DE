@@ -1,7 +1,7 @@
 *** BTRFS
-cfdisk /dev/nvme0n1 && mkfs.vfat -F 32 /dev/nvme0n1p1 && cryptsetup -c aes-xts-plain64 -s 512 -y luksFormat /dev/nvme0n1p2 && cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mkfs.btrfs /dev/mapper/cryptroot && mount /dev/mapper/cryptroot /mnt/gentoo 
+cfdisk /dev/nvme0n1 && mkfs.vfat -F 32 /dev/nvme0n1p1 && cryptsetup -c aes-xts-plain64 -s 512 -y luksFormat /dev/nvme0n1p2 && cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mkfs.btrfs /dev/mapper/cryptroot && mkdir /mnt/gentoo && mount /dev/mapper/cryptroot /mnt/gentoo 
 
-btrfs subvolume create /mnt/gentoo/@ && btrfs subvolume create /mnt/gentoo/@/.snapshots && mkdir /mnt/gentoo/@/.snapshots/1 && btrfs subvolume create /mnt/gentoo/@/.snapshots/1/snapshot && mkdir -p /mnt/gentoo/@/boot/grub2/ && btrfs subvolume create /mnt/gentoo/@/boot/grub2/i386-pc && btrfs subvolume create /mnt/gentoo/@/boot/grub2/x86_64-efi && btrfs subvolume create /mnt/gentoo/@/home && btrfs subvolume create /mnt/gentoo/@/opt && btrfs subvolume create /mnt/gentoo/@/srv && btrfs subvolume create /mnt/gentoo/@/tmp && mkdir /mnt/gentoo/@/usr/ && btrfs subvolume create /mnt/gentoo/@/usr/local && btrfs subvolume create /mnt/gentoo/@/var && btrfs subvolume create /mnt/gentoo/@/var/log && btrfs subvolume create /mnt/gentoo/@/var/log/audit && chattr +c /mnt/gentoo/@/var
+btrfs subvolume create /mnt/gentoo/@ && btrfs subvolume create /mnt/gentoo/@/.snapshots && mkdir /mnt/gentoo/@/.snapshots/1 && btrfs subvolume create /mnt/gentoo/@/.snapshots/1/snapshot && mkdir -p /mnt/gentoo/@/boot/grub2/ && btrfs subvolume create /mnt/gentoo/@/boot/grub2/i386-pc && btrfs subvolume create /mnt/gentoo/@/boot/grub2/x86_64-efi && btrfs subvolume create /mnt/gentoo/@/home && btrfs subvolume create /mnt/gentoo/@/opt && btrfs subvolume create /mnt/gentoo/@/root && btrfs subvolume create /mnt/gentoo/@/srv && btrfs subvolume create /mnt/gentoo/@/tmp && mkdir /mnt/gentoo/@/usr/ && btrfs subvolume create /mnt/gentoo/@/usr/local && btrfs subvolume create /mnt/gentoo/@/var && btrfs subvolume create /mnt/gentoo/@/var/log && btrfs subvolume create /mnt/gentoo/@/var/log/audit && chattr +c /mnt/gentoo/@/var
 
 nvim /mnt/gentoo/@/.snapshots/1/info.xml
 
@@ -17,7 +17,7 @@ btrfs subvolume set-default $(btrfs subvolume list /mnt/gentoo | grep "@/.snapsh
 
 mkdir /mnt/gentoo/.snapshots && mkdir -p /mnt/gentoo/boot/grub2/i386-pc && mkdir -p /mnt/gentoo/boot/grub2/x86_64-efi && mkdir /mnt/gentoo/home && mkdir /mnt/gentoo/opt && mkdir /mnt/gentoo/srv && mkdir /mnt/gentoo/tmp && mkdir -p /mnt/gentoo/usr/local && mkdir -p /mnt/gentoo/var/log/audit
 
-mount /dev/mapper/cryptroot /mnt/gentoo -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ && mount /dev/mapper/cryptroot /mnt/gentoo/.snapshots -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/.snapshots && mount /dev/mapper/cryptroot /mnt/gentoo/boot/grub2/i386-pc -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/boot/grub2/i386-pc && mount /dev/mapper/cryptroot /mnt/gentoo/boot/grub2/x86_64-efi -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/boot/grub2/x86_64-efi && mount /dev/mapper/cryptroot /mnt/gentoo/home -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/home && mount /dev/mapper/cryptroot /mnt/gentoo/opt -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/opt && mount /dev/mapper/cryptroot /mnt/gentoo/srv -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/srv && mount /dev/mapper/cryptroot /mnt/gentoo/tmp -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/tmp && mount /dev/mapper/cryptroot /mnt/gentoo/usr/local -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/usr/local && mount /dev/mapper/cryptroot /mnt/gentoo/var -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/var && mount /dev/mapper/cryptroot /mnt/gentoo/var/log -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/var/log &&  mount /dev/mapper/cryptroot /mnt/gentoo/var/log/audit -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/var/log/audit  
+mount /dev/mapper/cryptroot /mnt/gentoo -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@ && mount /dev/mapper/cryptroot /mnt/gentoo/.snapshots -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/.snapshots && mount /dev/mapper/cryptroot /mnt/gentoo/boot/grub2/i386-pc -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/boot/grub2/i386-pc && mount /dev/mapper/cryptroot /mnt/gentoo/boot/grub2/x86_64-efi -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/boot/grub2/x86_64-efi && mount /dev/mapper/cryptroot /mnt/gentoo/home -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/home && mount /dev/mapper/cryptroot /mnt/gentoo/opt -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/opt &&  mount /dev/mapper/cryptroot /mnt/gentoo/root -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/root && mount /dev/mapper/cryptroot /mnt/gentoo/srv -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/srv && mount /dev/mapper/cryptroot /mnt/gentoo/tmp -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/tmp && mount /dev/mapper/cryptroot /mnt/gentoo/usr/local -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/usr/local && mount /dev/mapper/cryptroot /mnt/gentoo/var -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/var && mount /dev/mapper/cryptroot /mnt/gentoo/var/log -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/var/log &&  mount /dev/mapper/cryptroot /mnt/gentoo/var/log/audit -o noatime,compress=zstd,space_cache=v2,discard=async,subvol=@/var/log/audit  
  
 
 * Download gentoo
@@ -144,7 +144,6 @@ sys-apps/apparmor ~amd64
 sys-apps/apparmor-utils ~amd64
 sys-libs/libapparmor ~amd64
 sec-policy/apparmor-profiles ~amd64
-x11-wm/qtile ~amd64
 www-client/brave-bin ~amd64
 media-sound/pamixer ~amd64
 kde-misc/krusader ~amd64
@@ -183,8 +182,8 @@ rm -R /mnt/gentoo/etc/portage/package.use && nano -w /mnt/gentoo/etc/portage/pac
 */* PYTHON_TARGETS: python3_11
 app-editors/neovim lto
 net-libs/nodejs lto npm 
-dev-lang/rust clippy miri nightly rust-analyzer rustfmt system-llvm rust-src
-net-p2p/transmission -gtk qt5 -qt6
+dev-lang/rust clippy miri rust-analyzer rustfmt system-llvm rust-src
+net-p2p/transmission -gtk qt5 qt6
 sys-config/ltoize keep-nocommon clang
 dev-util/cmake -emacs ncurses -qt5
 media-fonts/iosevka X iosevka-aile
@@ -241,7 +240,9 @@ media-gfx/sxiv exif gif jpeg png webp
 app-misc/fdupes ncurses
 dev-libs/libpcre2 pcre32
 kde-apps/okular djvu epub markdown pdf tiff
-lxqt-base/lxqt-meta about -admin archiver desktop-portal -display-manager filemanager lximage minimal -nls policykit powermanagement -processviewer -screenshot -sddm -ssh-askpass sudo -terminal trash
+lxqt-base/lxqt-meta about -admin archiver desktop-portal -display-manager -filemanager -lximage minimal -nls policykit powermanagement -processviewer -screenshot -sddm -ssh-askpass -sudo -terminal -trash
+www-client/firefox clang -eme-free geckodriver gmp-autoupdate hwaccel lto openh264 pgo -system-av1 -system-harfbuzz -system-icu -system-jpeg -system-libevent -system-libvpx -system-png -system-python-libs -system-webp -wifi 
+
 
 rm -R /mnt/gentoo/etc/portage/package.mask && nano -w /mnt/gentoo/etc/portage/package.mask
 
@@ -260,7 +261,7 @@ chroot /mnt/gentoo /bin/bash
 source /etc/profile
 export PS1="(chroot) ${PS1}"
 
-emerge-webrsync && emerge --sync --quiet && emerge -aq app-eselect/eselect-repository dev-vcs/git --jobs=10 && eselect repository remove gentoo && eselect repository add gentoo git https://github.com/gentoo-mirror/gentoo.git  && emaint sync -r gentoo && eselect repository enable guru brave-overlay lto-overlay mv CachyOS-kernels && emerge --sync && emerge -aq ltoize lto-rebuild --jobs=10 && lto-rebuild -r
+emerge-webrsync && emerge --sync && emerge -aq app-eselect/eselect-repository dev-vcs/git --jobs=10 && eselect repository remove gentoo && eselect repository add gentoo git https://github.com/gentoo-mirror/gentoo.git  && emaint sync -r gentoo && eselect repository enable guru lto-overlay mv src_prepare-overlay && emerge --sync && emerge -aq ltoize lto-rebuild --jobs=10 && lto-rebuild -r
 
 * gcc upgrade
 emerge -aq sys-devel/gcc && eselect gcc list && eselect gcc set 2 && lto-rebuild -r && emerge --ask --oneshot --usepkg=n sys-devel/libtool && emerge -eq --usepkg=n @world --jobs=10 --keep-going --exclude gcc
@@ -287,12 +288,10 @@ genkernel --luks --menuconfig --install all
 ** miscellenous apps
 grub-install --target=x86_64-efi --efi-directory=/boot && grub-install --target=x86_64-efi --efi-directory=/boot --removable && grub-mkconfig -o /boot/grub/grub.cfg
 
-emerge -aq  app-arch/unzip app-arch/zip app-arch/unrar sys-fs/btrfs-progs sys-fs/dosfstools net-misc/wget net-misc/curl app-misc/ckb app-admin/sudo app-text/zathura app-text/zathura-meta dev-python/pynvim app-editors/neovim sys-apps/ripgrep dev-util/tree-sitter-cli sys-apps/fd app-shells/zsh app-shells/zsh-completions app-shells/gentoo-zsh-completions app-shells/zoxide app-shells/fzf dev-util/fnm dev-vcs/lazygit x11-misc/rofi x11-misc/dunst x11-misc/xsel x11-misc/xclip  app-forensics/aide sys-apps/rng-tools sys-apps/haveged app-forensics/lynis sys-process/audit app-admin/sysstat sys-process/acct sys-boot/grub sys-apps/mlocate app-misc/tmux x11-themes/papirus-icon-theme x11-misc/jgmenu app-portage/smart-live-rebuild app-portage/gentoolkit media-fonts/nerd-fonts x11-misc/gammastep net-im/discord app-text/xournalpp sys-power/power-profiles-daemon app-admin/stow net-misc/networkmanager x11-terms/kitty x11-terms/kitty-terminfo x11-terms/kitty-shell-integration app-misc/ranger app-misc/vifm sys-apps/apparmor sys-apps/apparmor-utils sys-libs/libapparmor sec-policy/apparmor-profiles media-sound/pamixer kde-misc/krusader  x11-apps/setxkbmap sci-misc/jupyterlab-desktop-bin sci-chemistry/pymol dev-python/chardet dev-python/pillow app-arch/atool net-im/zoom app-admin/keepassxc
+emerge -av --jobs=10  app-arch/unzip app-arch/zip app-arch/unrar sys-fs/btrfs-progs sys-fs/dosfstools net-misc/wget net-misc/curl app-misc/ckb app-admin/sudo app-text/zathura app-text/zathura-meta dev-python/pynvim app-editors/neovim sys-apps/ripgrep dev-util/tree-sitter-cli sys-apps/fd app-shells/zsh app-shells/zsh-completions app-shells/gentoo-zsh-completions app-shells/zoxide app-shells/fzf dev-vcs/lazygit x11-misc/rofi x11-misc/dunst app-forensics/aide sys-apps/rng-tools sys-apps/haveged app-forensics/lynis sys-process/audit app-admin/sysstat sys-process/acct sys-boot/grub sys-apps/mlocate app-misc/tmux x11-themes/papirus-icon-theme x11-misc/jgmenu app-portage/smart-live-rebuild app-portage/gentoolkit media-fonts/nerd-fonts net-im/discord app-text/xournalpp sys-power/power-profiles-daemon app-admin/stow x11-terms/kitty x11-terms/kitty-terminfo x11-terms/kitty-shell-integration app-misc/ranger app-misc/vifm sys-apps/apparmor sys-apps/apparmor-utils sys-libs/libapparmor sec-policy/apparmor-profiles media-sound/pamixer sci-misc/jupyterlab-desktop-bin net-im/zoom app-misc/tealdeer sys-apps/grep x11-wm/qtile kde-misc/krusader app-admin/keepassxc sci-chemistry/pymol kde-plasma/plasma-meta kde-frameworks/krunner kde-apps/ark media-video/vlc kde-apps/spectacle kde-apps/gwenview kde-apps/dolphin kde-apps/kdepim-meta gui-apps/wl-clipboard dev-python/pywlroots x11-base/xwayland x11-libs/libdrm media-libs/libglvnd x11-libs/libxcb media-libs/mesa x11-apps/mesa-progs gui-libs/egl-wayland x11-drivers/nvidia-drivers 
 
 
- 
-   
-pymol
+
 
 ** custom ebuilds 9999
 x11-wm/bspwm

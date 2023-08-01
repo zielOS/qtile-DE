@@ -3,9 +3,9 @@ git clone https://aur.archlinux.org/yay-bin.git
 cd yay-bin
 makepkg -si && cd
 
-yay -S qtile-git
-yay -S qtile-extras-git
-yay -S sxhkd-git
+yay -S qtile-extras
+yay -S pamac-all
+yay -S planify
 yay -S papirus-folders-catppuccin-git 
 yay -S catppuccin-gtk-theme-mocha 
 yay -S catppuccin-cursors-mocha 
@@ -23,6 +23,7 @@ yay -S mullvad-vpn
 yay -S zramd
 yay -S nodejs-neovim
 yay -S eww-x11-git
+yay -S texlive-latexindent-meta
  
 sudo systemctl set-default graphical.target 
 systemctl --user enable --now wireplumber.service pipewire-pulse.socket pipewire.socket pipewire-pulse.service pipewire.service pipewire-pulse.socket pipewire.socket pipewire-pulse.service pipewire.service emacs-28 && sudo systemctl enable zramd ckb-next-daemon
