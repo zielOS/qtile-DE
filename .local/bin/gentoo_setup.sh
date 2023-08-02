@@ -1,9 +1,5 @@
 *** BTRFS
-cfdisk /dev/nvme0n1 && mkfs.vfat -F 32 /dev/nvme0n1p1 && cryptsetup -c aes-xts-plain64 -s 512 -y luksFormat /dev/nvme0n1p2 && cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mkfs.btrfs /dev/mapper/cryptroot && mkdir /mnt/gentoo && mount /dev/mapper/cryptroot /mnt/gentoo 
-
-btrfs subvolume create /mnt/gentoo/@ && btrfs subvolume create /mnt/gentoo/@/.snapshots && mkdir /mnt/gentoo/@/.snapshots/1 && btrfs subvolume create /mnt/gentoo/@/.snapshots/1/snapshot && mkdir -p /mnt/gentoo/@/boot/grub2/ && btrfs subvolume create /mnt/gentoo/@/boot/grub2/i386-pc && btrfs subvolume create /mnt/gentoo/@/boot/grub2/x86_64-efi && btrfs subvolume create /mnt/gentoo/@/home && btrfs subvolume create /mnt/gentoo/@/opt && btrfs subvolume create /mnt/gentoo/@/root && btrfs subvolume create /mnt/gentoo/@/srv && btrfs subvolume create /mnt/gentoo/@/tmp && mkdir /mnt/gentoo/@/usr/ && btrfs subvolume create /mnt/gentoo/@/usr/local && btrfs subvolume create /mnt/gentoo/@/var && btrfs subvolume create /mnt/gentoo/@/var/log && btrfs subvolume create /mnt/gentoo/@/var/log/audit && chattr +c /mnt/gentoo/@/var
-
-nvim /mnt/gentoo/@/.snapshots/1/info.xml
+cfdisk /dev/nvme0n1 && mkfs.vfat -F 32 /dev/nvme0n1p1 && cryptsetup -c aes-xts-plain64 -s 512 -y luksFormat /dev/nvme0n1p2 && cryptsetup luksOpen /dev/nvme0n1p2 cryptroot && mkfs.btrfs /dev/mapper/cryptroot && mkdir /mnt/gentoo && mount /dev/mapper/cryptroot /mnt/gentoo && btrfs subvolume create /mnt/gentoo/@ && btrfs subvolume create /mnt/gentoo/@/.snapshots && mkdir /mnt/gentoo/@/.snapshots/1 && btrfs subvolume create /mnt/gentoo/@/.snapshots/1/snapshot && mkdir -p /mnt/gentoo/@/boot/grub2/ && btrfs subvolume create /mnt/gentoo/@/boot/grub2/i386-pc && btrfs subvolume create /mnt/gentoo/@/boot/grub2/x86_64-efi && btrfs subvolume create /mnt/gentoo/@/home && btrfs subvolume create /mnt/gentoo/@/opt && btrfs subvolume create /mnt/gentoo/@/root && btrfs subvolume create /mnt/gentoo/@/srv && btrfs subvolume create /mnt/gentoo/@/tmp && mkdir /mnt/gentoo/@/usr/ && btrfs subvolume create /mnt/gentoo/@/usr/local && btrfs subvolume create /mnt/gentoo/@/var && btrfs subvolume create /mnt/gentoo/@/var/log && btrfs subvolume create /mnt/gentoo/@/var/log/audit && chattr +c /mnt/gentoo/@/var && nvim /mnt/gentoo/@/.snapshots/1/info.xml
 
 <?xml version="1.0"?>
 <snapshot>
@@ -43,14 +39,15 @@ FFLAGS="${COMMON_FLAGS}"
 RUSTFLAGS="-C opt-level=3 -C target-cpu=native"
 MAKEOPTS="-j22"
 NOCOMMON_OVERRIDE_LIBTOOL="yes"
-#ACCEPT_KEYWORDS="~amd64"
+ACCEPT_KEYWORDS="~amd64"
 ACCEPT_LICENSE="*"
-VIDEO_CARDS="nvidia"
-USE="-elogind systemd -gnome  -berkdb  -kde -ccache -tpm zstd policykit \
-      clamav -coreaudio -ios -ipod -ieee1394 -motif gtk pulseaudio \
-      -emboss -3dfx -altivec -smartcard -ibm -wayland -nls -nas pam  \
+VIDEO_CARDS="nvidia intel"
+USE="-elogind systemd -gnome -berkdb -kde -ccache -tpm zstd policykit \
+      clamav -coreaudio -ios -ipod -ieee1394 -motif gtk pulseaudio qt5 qt6 \
+      -emboss -3dfx -altivec -smartcard -ibm -wayland -nls -nas pam clang  \
       -neon -nntp -cups -quicktime nvidia sound-server -vim apparmor \
-      pie gstreamer X upower hardened udev alsa audit dbus tiff jpeg"
+      pie gui X upower hardened udev alsa audit dbus tiff jpeg lto pgo \
+      -accessibility -bluetooth -handbook"
 #RUBY_TARGETS="ruby24 ruby25"
 # NOTE: This stage was built with the bindist Use flag enabled
 PORTDIR="/var/db/repos/gentoo"
@@ -74,85 +71,11 @@ rm -R /mnt/gentoo/etc/portage/package.accept_keywords && nano -w /mnt/gentoo/etc
 =x11-misc/ly-9999 ** ~amd64
 =gui-apps/eww-9999 ** ~amd64
 =x11-misc/jgmenu-9999 ** ~amd64
-app-eselect/eselect-repository ~amd64
-dev-vcs/git ~amd64
-sys-devel/gcc ~amd64
-sys-config/ltoize ~amd64
-app-portage/portage-bashrc-mv ~amd64
-app-portage/lto-rebuild ~amd64
-sys-devel/libtool ~amd64
-sys-kernel/cachyos-sources ~amd64
-sys-fs/genfstab ~amd64
-sys-kernel/linux-firmware ~amd64
-sys-kernel/linux-headers ~amd64
-sys-kernel/genkernel ~amd64
-sys-apps/fwupd ~amd64
-sys-fs/cryptsetup ~amd64
-sys-firmware/intel-microcode ~amd64
-app-arch/unzip ~amd64
-app-arch/zip ~amd64
-app-arch/unrar ~amd64
-sys-fs/btrfs-progs ~amd64
-sys-fs/dosfstools ~amd64
-net-misc/wget ~amd64
-net-misc/curl ~amd64
-app-misc/ckb ~amd64
-app-admin/sudo ~amd64
-app-text/zathura ~amd64
-app-text/zathura-meta ~amd64
-dev-python/pynvim ~amd64
-app-editors/neovim ~amd64
-sys-apps/ripgrep ~amd64
-dev-util/tree-sitter-cli ~amd64
-sys-apps/fd ~amd64
-app-shells/zsh ~amd64
-app-shells/zsh-completions ~amd64
-app-shells/gentoo-zsh-completions ~amd64
-app-shells/zoxide ~amd64
-app-shells/fzf ~amd64
-dev-vcs/lazygit ~amd64
-x11-misc/rofi ~amd64
-x11-misc/dunst ~amd64
-x11-misc/xsel ~amd64
-x11-misc/xclip ~amd64
-x11-drivers/nvidia-drivers ~amd64 
-app-forensics/aide ~amd64
-sys-apps/rng-tools ~amd64
-sys-apps/haveged ~amd64
-app-forensics/lynis ~amd64
-sys-process/audit ~amd64
-app-admin/sysstat ~amd64
-sys-process/acct ~amd64
-sys-boot/grub ~amd64
-sys-apps/mlocate ~amd64
-app-misc/tmux ~amd64
-x11-themes/papirus-icon-theme ~amd64
-x11-misc/jgmenu ~amd64
-app-portage/smart-live-rebuild ~amd64
-app-portage/gentoolkit ~amd64
-media-fonts/nerd-fonts ~amd64
-x11-misc/gammastep ~amd64
-net-im/discord ~amd64
-app-text/xournalpp ~amd64 
-sys-power/power-profiles-daemon ~amd64
-app-admin/stow ~amd64
-net-misc/networkmanager ~amd64 
-x11-terms/alacritty ~amd64 
-app-misc/ranger ~amd64
-app-misc/vifm ~amd64
-sys-apps/apparmor ~amd64
-sys-apps/apparmor-utils ~amd64
-sys-libs/libapparmor ~amd64
-sec-policy/apparmor-profiles ~amd64
-www-client/brave-bin ~amd64
-media-sound/pamixer ~amd64
-kde-misc/krusader ~amd64
-lxqt-base/lxqt-meta ~amd64
-kde-apps/okular ~amd64
-dev-libs/isl ~amd64
+=media-sound/pamixer-9999 ** ~amd64
 
 nano -w /mnt/gentoo/etc/portage/profile/use.mask
 -lto
+-gmp-autoupdate
 
 mkdir -p /mnt/gentoo/etc/portage/profile/ && nano -w /mnt/gentoo/etc/portage/profile/package.provided
 
@@ -218,7 +141,7 @@ dev-libs/boost context
 dev-libs/boehm-gc cxx
 virtual/libcrypt static-libs
 sys-libs/libxcrypt static-libs
-media-fonts/nerd-fonts jetbrainsmono firacode
+media-fonts/nerd-fonts jetbrainsmono firacode ubuntu
 gui-libs/gtk-layer-shell introspection
 net-wireless/wpa_supplicant dbus
 net-libs/libssh server
@@ -239,9 +162,15 @@ app-portage/eix optimization strong-security tools
 media-gfx/sxiv exif gif jpeg png webp
 app-misc/fdupes ncurses
 dev-libs/libpcre2 pcre32
+dev-qt/qtcore icu
+media-libs/libvpx postproc
+x11-base/xorg-server xvfb
+gui-libs/wlroots tinywl
+x11-drivers/nvidia-drivers modules modules-sign
+kde-plasma/plasma-meta browser-integration -colord -crash-handler crypt desktop-portal -discover -display-manager -firewall -grub gtk -kwallet -legacy-systray -plymouth -sddm -sdk -smart thunderbolt -wallpapers
 kde-apps/okular djvu epub markdown pdf tiff
-lxqt-base/lxqt-meta about -admin archiver desktop-portal -display-manager -filemanager -lximage minimal -nls policykit powermanagement -processviewer -screenshot -sddm -ssh-askpass -sudo -terminal -trash
-www-client/firefox clang -eme-free geckodriver gmp-autoupdate hwaccel lto openh264 pgo -system-av1 -system-harfbuzz -system-icu -system-jpeg -system-libevent -system-libvpx -system-png -system-python-libs -system-webp -wifi 
+#lxqt-base/lxqt-meta about -admin archiver desktop-portal -display-manager -filemanager -lximage minimal -nls policykit powermanagement -processviewer -screenshot -sddm -ssh-askpass -sudo -terminal -trash
+www-client/firefox X clang dbus geckodriver gmp-autoupdate hardened hwaccel jumbo-build lto openh264 pgo pulseaudio -telemetry -wayland -debug -eme-free jack -libproxy screencast 
 
 
 rm -R /mnt/gentoo/etc/portage/package.mask && nano -w /mnt/gentoo/etc/portage/package.mask
@@ -307,8 +236,8 @@ grub-install --target=x86_64-efi --efi-directory=/boot && grub-install --target=
 
 nvim /etc/default/grub
 :w
-GRUB_CMDLINE_LINUX="quiet crypt_root=UUID=ba0757f4-a2f6-411d-a3cc-795c073be4f2 root_trim=yes init=/lib/systemd/systemd"
-GRUB_CMDLINE_LINUX_DEFAULT="apparmor=1 security=apparmor" 
+GRUB_CMDLINE_LINUX="quiet crypt_root=UUID=6d16f447-973d-49e6-b01d-c6938c732d2e root_trim=yes init=/lib/systemd/systemd"
+GRUB_CMDLINE_LINUX_DEFAULT="apparmor=1 security=apparmor nvidia-drm.modeset=1" 
 
 # Setup systemd
 systemd-firstboot --prompt --setup-machine-id && systemctl enable NetworkManager fstrim.timer power-profiles-daemon systemd-timesyncd sysstat apparmor auditd nvidia-hibernate.service nvidia-suspend.service nvidia-resume.service nvidia-powerd.service

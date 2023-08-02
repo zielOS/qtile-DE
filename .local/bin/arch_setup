@@ -34,7 +34,7 @@ passwd && useradd -m -G users,wheel,audio,video -s /bin/bash ahsan && passwd ahs
 grub-install --target=x86_64-efi --efi-directory=/boot && grub-install --target=x86_64-efi --efi-directory=/boot --removable && grub-mkconfig -o /boot/grub/grub.cfg
 
 nvim /etc/default/grub
-GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=ce3c71ec-73d5-434a-91ee-a6346038c7da:cryptroot root=/dev/mapper/cryptroot lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
+GRUB_CMDLINE_LINUX_DEFAULT="loglevel=3 quiet cryptdevice=UUID=931e752e-e442-42a6-9e39-4a368b39541d:cryptroot root=/dev/mapper/cryptroot lsm=landlock,lockdown,yama,integrity,apparmor,bpf"
 
 *** systemd
 ln -sf ../usr/share/zoneinfo/Canada/Mountain /etc/localtime && nvim /etc/locale.gen && locale-gen && echo "LANG=en_CA.UTF-8" >> /etc/locale.conf
